@@ -1,0 +1,41 @@
+from enum import Enum
+class Location(Enum):
+    A = "Location A"
+    B = "Location B"
+
+def vacuum_model(initial_location: Location, dirty_A: bool, dirty_B: bool):
+    current_location = initial_location
+
+    
+    step = 1
+    while True:
+        if current_location == Location.A:
+         
+            if dirty_A:
+               
+                dirty_A = False
+            if dirty_B:
+                print("Moving to Location B")
+                current_location = Location.B
+        elif current_location == Location.B:
+            print(f"Currently in: {current_location.value}")
+            if dirty_B:
+                
+                dirty_B = False
+            
+            # Move to A if A is dirty
+            if dirty_A:
+                print("Action: MOVE LEFT -> Moving to Location A")
+                current_location = Location.A
+
+        # Stop condition: Both rooms are clean
+        if not dirty_A and not dirty_B:
+            print("\nResult: Both rooms are clean! Stopping vacuum.")
+            break
+            
+        step += 1
+        print()
+
+
+   
+vacuum_model(initial_location=Location.A, dirty_A=True, dirty_B=True)
