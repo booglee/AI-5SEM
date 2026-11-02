@@ -1,0 +1,64 @@
+import math
+import random
+
+
+def get_conflicts(board):
+    """Counts how many pairs of queens attack each other."""
+    conflicts = 0
+    n = len(board)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if board[i] == board[j] or abs(board[i] - board[j]) == abs(i - j):
+                conflicts += 1
+    return conflicts
+
+
+def simulated_annealing_8_queens():
+    # 1. Start with a completely random board
+    board = [random.randint(0, 7) for _ in range(8)]
+
+    # 2. Set cooling parameters
+    T = 100.0  # Initial temperature
+    cooling_rate = 0.99  # How fast it cools down
+
+    print("Starting board:", board, "with", get_conflicts(board), "conflicts.")
+
+    # Loop until the system freezes or a solution is found
+    while T > 0.01:
+        current_conflicts = get_conflicts(board)
+
+        if current_conflicts == 0:
+            print("\nSuccess! Found a perfect solution:", board)
+            return board
+
+        # 3. Pick a completely random neighbor state (move one queen)
+        random_col = random.randint(0, 7)
+        random_row = random.randint(0, 7)
+
+        neighbor = list(board)
+        neighbor[random_col] = random_row
+        neighbor_conflicts = get_conflicts(neighbor)
+
+        # 4. Decide if we should move to this neighbor
+        # delta < 0 means the new board is better
+        delta = neighbor_conflicts - current_conflicts
+
+        if delta < 0:
+            # Always accept better configurations
+            board = neighbor
+        else:
+            # If the new board is worse, accept it based on probability!
+            # High Temperature = high chance to accept bad moves.
+            probability = math.exp(-delta / T)
+            if random.random() < probability:
+                board = neighbor
+
+        # 5. Cool down the temperature
+        T *= cooling_rate
+
+    print("\nTemperature cooled down. Final board:", board, "with", get_conflicts(board), "conflicts.")
+    return board
+
+
+# Run the solver
+simulated_annealing_8_queens()
