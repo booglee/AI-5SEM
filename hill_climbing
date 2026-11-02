@@ -1,0 +1,57 @@
+import random
+
+def get_conflicts(board):
+    """Counts how many pairs of queens attack each other."""
+    conflicts = 0
+    n = len(board)
+    for i in range(n):
+        for j in range(i + 1, n):
+            # Check if they share the same row or same diagonal
+            if board[i] == board[j] or abs(board[i] - board[j]) == abs(i - j):
+                conflicts += 1
+    return conflicts
+
+def solve_8_queens():
+    # 1. Start with a completely random board (index = column, value = row)
+    board = [random.randint(0, 7) for _ in range(8)]
+    print("Starting board:", board, "with", get_conflicts(board), "conflicts.")
+
+    while True:
+        current_conflicts = get_conflicts(board)
+        
+        # If there are no conflicts, we found a perfect solution!
+        if current_conflicts == 0:
+            print("Success! Found a perfect solution:", board)
+            return board
+
+        best_neighbor = list(board)
+        best_conflicts = current_conflicts
+
+        # 2. Look at every possible single-queen move to find an improvement
+        for col in range(8):
+            for row in range(8):
+                if board[col] == row: 
+                    continue # Skip the current position
+                
+                # Test moving the queen in this column to a new row
+                neighbor = list(board)
+                neighbor[col] = row
+                neighbor_conflicts = get_conflicts(neighbor)
+
+                # Keep track of the absolute lowest conflict score
+                if neighbor_conflicts < best_conflicts:
+                    best_conflicts = neighbor_conflicts
+                    best_neighbor = neighbor
+
+        # 3. If no move made the board better, we are stuck in a local minimum
+        if best_conflicts >= current_conflicts:
+            print("Stuck in a local minimum at board:", board, f"({current_conflicts} conflicts)")
+            print("Standard hill climbing stops here.")
+            return board
+
+        # Move to the better board configuration and repeat
+        board = best_neighbor
+        print("Moved to better board:", board, "with", best_conflicts, "conflicts.")
+
+# Run the simplified solver
+solve_8_queens()
