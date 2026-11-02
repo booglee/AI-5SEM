@@ -1,0 +1,49 @@
+import heapq
+
+# Goal state where '0' is the empty space
+GOAL = "123456780"
+
+# Maps the position of '0' to the index positions it can swap with
+MOVES = {
+    0:,    1:,    2:,
+    3:, 4:, 5:,
+    6:,    7:,    8: [5, 7]
+}
+
+def get_h(board):
+    """Heuristic: Counts how many tiles are in the wrong position."""
+    return sum(1 for b, g in zip(board, GOAL) if b != g and b != '0')
+
+def solve_8_puzzle(start):
+    # Priority Queue stores: (f_score, g_score, current_board_string)
+    # f = g (steps taken) + h (wrong tiles)
+    queue = [(get_h(start), 0, start)]
+    visited = set()
+
+    while queue:
+        f, g, current = heapq.heappop(queue)
+
+        if current == GOAL:
+            return g  # Found it! Return total moves taken
+
+        if current in visited:
+            continue
+        visited.add(current)
+
+        # Find where the empty space '0' is
+        zero_idx = current.index('0')
+        
+        # Move '0' to all its valid neighbor positions
+        for move_idx in MOVES[zero_idx]:
+            # Swap characters to make a neighbor board
+            board_list = list(current)
+            board_list[zero_idx], board_list[move_idx] = board_list[move_idx], board_list[zero_idx]
+            neighbor = "".join(board_list)
+
+            if neighbor not in visited:
+                heapq.heappush(queue, (g + 1 + get_h(neighbor), g + 1, neighbor))
+
+# Run the solver with a sample string board
+start_board = "123405786" 
+moves_needed = solve_8_puzzle(start_board)
+print(f"Solved in {moves_needed} moves!")
