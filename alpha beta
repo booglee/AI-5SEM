@@ -1,0 +1,74 @@
+import math
+
+
+def alpha_beta_pruning(
+    depth, node_index, is_maximizing_player, values, alpha, beta, max_depth
+):
+    # Base case: leaf node is reached
+    if depth == max_depth:
+        return values[node_index]
+
+    if is_maximizing_player:
+        best_val = -math.inf
+
+        # Recur for left and right children
+        for i in range(2):
+            val = alpha_beta_pruning(
+                depth + 1,
+                node_index * 2 + i,
+                False,
+                values,
+                alpha,
+                beta,
+                max_depth,
+            )
+            best_val = max(best_val, val)
+            alpha = max(alpha, best_val)
+
+            # Alpha-Beta Pruning condition
+            if beta <= alpha:
+                break
+
+        return best_val
+
+    else:
+        best_val = math.inf
+
+        # Recur for left and right children
+        for i in range(2):
+            val = alpha_beta_pruning(
+                depth + 1,
+                node_index * 2 + i,
+                True,
+                values,
+                alpha,
+                beta,
+                max_depth,
+            )
+            best_val = min(best_val, val)
+            beta = min(beta, best_val)
+
+            # Alpha-Beta Pruning condition
+            if beta <= alpha:
+                break
+
+        return best_val
+
+
+# Example Usage
+if __name__ == "__main__":
+    # Leaf node values for a tree of depth 3 (2^3 = 8 leaves)
+    leaf_values = [3, 5, 6, 9, 1, 2, 0, -1]
+    tree_depth = int(math.log2(len(leaf_values)))
+
+    optimal_value = alpha_beta_pruning(
+        depth=0,
+        node_index=0,
+        is_maximizing_player=True,
+        values=leaf_values,
+        alpha=-math.inf,
+        beta=math.inf,
+        max_depth=tree_depth,
+    )
+
+    print(f"The optimal value is: {optimal_value}")
